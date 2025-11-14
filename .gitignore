@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+.venv/
+
+# Audio datasets (don't upload huge raw WAV files)
+data/raw/
+data/processed/features.csv
+
+# Models
+models/
+
+# Streamlit cache
+.streamlit/
+
+# macOS files
+.DS_Store
