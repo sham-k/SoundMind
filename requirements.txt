@@ -1,0 +1,19 @@
+# Core ML/Data Science
+numpy==1.23.5
+pandas==2.3.3
+scikit-learn==1.7.2
+
+# Deep Learning
+tensorflow==2.12.0
+tensorflow-macos==2.12.0  # For Apple Silicon Macs
+tensorflow-metal==1.0.0   # GPU acceleration on Mac
+
+# Audio Processing
+librosa==0.11.0
+
+# Web App
+streamlit==1.50.0
+plotly==6.4.0
+
+# Additional dependencies (auto-installed with above packages)
+# scipy, joblib, soundfile, audioread, etc.
