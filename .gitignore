@@ -11,11 +11,11 @@ __pycache__/
 data/raw/
 data/processed/features.csv
 
-# Models
-models/
+# Models - Keep models for deployment, exclude only during local development if needed
+# models/
 
-# Streamlit cache
-.streamlit/
+# Streamlit cache - Keep config for deployment
+.streamlit/secrets.toml
 
 # macOS files
 .DS_Store

@@ -3,10 +3,8 @@ numpy==1.23.5
 pandas==2.3.3
 scikit-learn==1.7.2
 
-# Deep Learning
+# Deep Learning - Use universal TensorFlow for cloud deployment
 tensorflow==2.12.0
-tensorflow-macos==2.12.0  # For Apple Silicon Macs
-tensorflow-metal==1.0.0   # GPU acceleration on Mac
 
 # Audio Processing
 librosa==0.11.0
@@ -15,5 +13,6 @@ librosa==0.11.0
 streamlit==1.50.0
 plotly==6.4.0
 
-# Additional dependencies (auto-installed with above packages)
-# scipy, joblib, soundfile, audioread, etc.
+# Additional audio dependencies
+soundfile
+audioread
