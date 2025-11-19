@@ -28,9 +28,18 @@ EMOTION_COLORS = {
 @st.cache_resource
 def load_predictor():
     """Load the emotion predictor model (cached)."""
-    model_path = "../models/emotion_model.h5"
-    encoder_path = "../models/label_encoder.pkl"
-    scaler_path = "../models/scaler.pkl"
+    import os
+    from pathlib import Path
+
+    # Get the directory of this file
+    current_dir = Path(__file__).parent
+    # Go up one level to the project root
+    project_root = current_dir.parent
+    models_dir = project_root / "models"
+
+    model_path = str(models_dir / "emotion_model.h5")
+    encoder_path = str(models_dir / "label_encoder.pkl")
+    scaler_path = str(models_dir / "scaler.pkl")
 
     return EmotionPredictor(model_path, encoder_path, scaler_path)
 
