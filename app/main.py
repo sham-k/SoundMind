@@ -31,17 +31,66 @@ def load_predictor():
     import os
     from pathlib import Path
 
-    # Get the directory of this file
-    current_dir = Path(__file__).parent
-    # Go up one level to the project root
-    project_root = current_dir.parent
-    models_dir = project_root / "models"
+    # Get the directory of this file (app/main.py)
+    current_file = Path(__file__).resolve()  # Get absolute path
+    app_dir = current_file.parent
+    project_root = app_dir.parent
 
-    model_path = str(models_dir / "emotion_model.h5")
-    encoder_path = str(models_dir / "label_encoder.pkl")
-    scaler_path = str(models_dir / "scaler.pkl")
+    # Try multiple possible locations for models directory
+    possible_model_dirs = [
+        project_root / "models",           # ../models from app/main.py (most reliable)
+        Path.cwd().parent / "models",      # When running from app/ directory
+        Path.cwd() / "models",             # When running from project root
+    ]
 
-    return EmotionPredictor(model_path, encoder_path, scaler_path)
+    models_dir = None
+    for dir_path in possible_model_dirs:
+        resolved_path = dir_path.resolve()  # Get absolute path
+        if resolved_path.exists() and resolved_path.is_dir():
+            # Verify it actually contains model files
+            model_files = list(resolved_path.glob("*.h5"))
+            if model_files:
+                models_dir = resolved_path
+                break
+
+    if models_dir is None:
+        raise FileNotFoundError(
+            f"Models directory not found or empty.\n"
+            f"Searched locations:\n" +
+            "\n".join([f"  - {p.resolve()}" for p in possible_model_dirs]) +
+            f"\n\nCurrent working directory: {Path.cwd()}\n"
+            f"Script location: {app_dir}\n"
+            f"Project root: {project_root}\n\n"
+            f"Please ensure models are in: {project_root / 'models'}"
+        )
+
+    # Try to load optimized model first, fall back to others
+    model_options = [
+        ("emotion_model_optimized.h5", "label_encoder_optimized.pkl", "scaler_optimized.pkl", "85.07%"),
+        ("emotion_model_enhanced.h5", "label_encoder_enhanced.pkl", "scaler_enhanced.pkl", "80.21%"),
+        ("emotion_model.h5", "label_encoder.pkl", "scaler.pkl", "65.69%"),
+    ]
+
+    for model_file, encoder_file, scaler_file, accuracy in model_options:
+        model_path = str(models_dir / model_file)
+        encoder_path = str(models_dir / encoder_file)
+        scaler_path = str(models_dir / scaler_file)
+
+        if os.path.exists(model_path) and os.path.exists(encoder_path) and os.path.exists(scaler_path):
+            predictor = EmotionPredictor(model_path, encoder_path, scaler_path)
+            predictor.model_name = model_file
+            predictor.model_accuracy = accuracy
+            return predictor
+
+    # If no model found, provide helpful error message
+    raise FileNotFoundError(
+        f"No trained model found in {models_dir}.\n"
+        f"Please ensure you have trained a model by running:\n"
+        f"  python train_optimized.py  (recommended)\n"
+        f"or:\n"
+        f"  python train_enhanced.py\n"
+        f"  python train.py"
+    )
 
 
 def create_probability_chart(probabilities):
@@ -159,8 +208,24 @@ def main():
 
     # Sidebar info
     st.sidebar.title(":information_source: About")
+
+    # Show model information if available
+    model_name = getattr(predictor, 'model_name', 'emotion_model.h5')
+    model_accuracy = getattr(predictor, 'model_accuracy', 'Unknown')
+
+    # Determine architecture based on model name
+    if 'optimized' in model_name:
+        architecture = "CNN + BiLSTM + Attention"
+        features = "MFCC, Chroma, Mel, Contrast, Tonnetz, ZCR, Spectral (392 dims)"
+    elif 'enhanced' in model_name:
+        architecture = "Hybrid CNN"
+        features = "MFCC, Chroma, Mel, Contrast, Tonnetz, ZCR, Spectral (392 dims)"
+    else:
+        architecture = "Dense Neural Network"
+        features = "MFCC (40 coefficients)"
+
     st.sidebar.info(
-        """
+        f"""
         **SoundMind** uses deep learning to analyze voice recordings
         and predict the speaker's emotional state.
 
@@ -174,11 +239,12 @@ def main():
         - Sad
         - Surprised
 
-        **Model Details:**
-        - Architecture: Deep Neural Network
-        - Features: MFCC (Mel-Frequency Cepstral Coefficients)
+        **Active Model:**
+        - Model: {model_name}
+        - Architecture: {architecture}
+        - Features: {features}
         - Training Data: RAVDESS Dataset
-        - Accuracy: ~66%
+        - Test Accuracy: {model_accuracy}
         """
     )
 

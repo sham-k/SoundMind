@@ -18,17 +18,23 @@ pip install -r requirements.txt
 Launch the interactive Streamlit web app:
 
 ```bash
-cd app
-streamlit run main.py
+# From project root (recommended):
+./run_app.sh
+
+# Or manually:
+streamlit run app/main.py
 ```
 
 This will open the app in your browser at `http://localhost:8501`
 
+The app automatically uses the best available model (prioritizing optimized → enhanced → baseline).
+
 **Features:**
 - Upload WAV audio files
-- Get instant emotion predictions
+- Get instant emotion predictions with 85% accuracy
 - View confidence scores and probability distributions
 - Beautiful visualizations with charts
+- Automatically uses the best available trained model
 
 ### Option 2: Command Line Testing
 
@@ -59,17 +65,25 @@ print(f"Confidence: {result['confidence']:.2%}")
 
 ## Training Your Own Model
 
-If you want to retrain the model:
+**Good news!** The optimized model (85.07% accuracy) is already trained and ready to use!
+
+If you want to retrain or improve further:
 
 ```bash
-# 1. Prepare your data in data/raw/ directory (RAVDESS format)
+# Retrain optimized model (recommended - 85% accuracy)
+python train_optimized.py
 
-# 2. Preprocess the data
-python app/preprocess.py
+# Or train enhanced model (80% accuracy)
+python train_enhanced.py
 
-# 3. Train the model
+# Or train ensemble (85-90% accuracy, takes ~90 min)
+python train_ensemble.py
+
+# Or baseline model (65% accuracy)
 python train.py
 ```
+
+See [TRAINING_GUIDE.md](TRAINING_GUIDE.md) for detailed training options and [MODEL_IMPROVEMENTS.md](MODEL_IMPROVEMENTS.md) for technical details.
 
 ## Project Structure
 
